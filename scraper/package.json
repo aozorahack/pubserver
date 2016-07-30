@@ -9,8 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "async": "^1.2.1",
-    "csv": "^0.4.5",
+    "async": "^2.0.1",
+    "csv-parse": "1.1.7",
     "scraperjs": "1.2.0"
   }
 }
