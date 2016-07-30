@@ -19,8 +19,8 @@
     "mongodb": "^2.0.33",
     "morgan": "~1.5.3",
     "multer": "^0.1.8",
-    "nodegit": "^0.4.1",
-    "nodegit-promise": "^2.0.1",
+    "nodegit": "0.14.1",
+    "nodegit-promise": "^4.0.0",
     "promisify-node": "^0.1.5",
     "request": "^2.58.0"
   },

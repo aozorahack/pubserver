@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "async": "^1.2.1",
-    "csv": "^0.4.5"
+    "csv": "^0.4.5",
+    "scraperjs": "1.2.0"
   }
 }
