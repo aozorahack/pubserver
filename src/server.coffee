@@ -92,7 +92,9 @@ app.route api_root + '/books'
   .get (req, res)->
     query = {}
     if req.query.name
-      query['title.name'] = req.query.name
+      query['title'] = req.query.name
+    if req.query.author
+      query['authors.0.last_name'] = req.query.author
     if req.query.after
       query['release_date'] = {"$gte": new Date (req.query.after)}
     options =
