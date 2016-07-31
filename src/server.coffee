@@ -94,7 +94,7 @@ app.route api_root + '/books'
     if req.query.name
       query['title'] = req.query.name
     if req.query.author
-      query['authors.0.last_name'] = req.query.author
+      query['authors.full_name'] = {"$in": [new RegExp req.query.author]}
     if req.query.after
       query['release_date'] = {"$gte": new Date (req.query.after)}
     options =

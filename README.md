@@ -47,6 +47,7 @@ curl http://pubserver-master.herokuapp.com/api/v0.1/books
 
 追加パラメータ
  - `name`: タイトル名でのフィルタ
+ - `author`: 著者名でのフィルタ
  - `fields`: 取得する属性を指定
  - `limit`: 取得するアイテム数を制限
  - `after`: release_dateがこの日付よりも新しいモノのみを返す(YYYY-MM-DD)
