@@ -92,7 +92,7 @@ app.route api_root + '/books'
   .get (req, res)->
     query = {}
     if req.query.name
-      query['title'] = req.query.name
+      query['title'] = {"$in": [new RegExp req.query.name]}
     if req.query.author
       query['authors.full_name'] = {"$in": [new RegExp req.query.author]}
     if req.query.after
