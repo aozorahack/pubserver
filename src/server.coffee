@@ -169,7 +169,7 @@ get_from_gs = (my, book_id, get_file, cb)->
 
 get_zipped = (my, book_id, cb)->
   my.books.findOne {book_id: book_id}, {text_url: 1}, (err, doc)->
-    if err
+    if err or doc is null
       cb err
       return
     request.get doc.text_url,
