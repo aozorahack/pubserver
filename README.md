@@ -46,7 +46,7 @@ curl http://pubserver-master.herokuapp.com/api/v0.1/books
 ```
 
 追加パラメータ
- - `name`: タイトル名でのフィルタ
+ - `title`: タイトル名でのフィルタ
  - `author`: 著者名でのフィルタ
  - `fields`: 取得する属性を指定
  - `limit`: 取得するアイテム数を制限
@@ -78,6 +78,10 @@ curl -Fpackage=@{package_file} http://pubserver-master.herokuapp.com/api/v0.1/bo
 ```
 curl http://pubserver-master.herokuapp.com/api/v0.1/persons
 ```
+
+追加パラメータ
+ - `name`: 著者名でのフィルタ
+
 
 #### 個別の人物の情報の取得
 ```

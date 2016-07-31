@@ -152,11 +152,12 @@ MongoClient.connect mongo_url, (err, db)->
                   books_batch_list[book.book_id] = book
                 if not books_batch_list[book.book_id][role]
                   books_batch_list[book.book_id][role] = []
+                person.full_name = person.last_name + person.first_name
                 books_batch_list[book.book_id][role].push
                   person_id: person.person_id
                   last_name: person.last_name
                   first_name: person.first_name
-                  full_name: person.last_name + person.first_name
+                  full_name: person.full_name
                 if not persons_batch_list[person.person_id]
                   persons_batch_list[person.person_id] = person
                 cb null,

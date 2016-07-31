@@ -91,8 +91,8 @@ upload_content_data = (db, book_id, source, cb)->
 app.route api_root + '/books'
   .get (req, res)->
     query = {}
-    if req.query.name
-      query['title'] = {"$in": [new RegExp req.query.name]}
+    if req.query.title
+      query['title'] = {"$in": [new RegExp req.query.title]}
     if req.query.author
       query['authors.full_name'] = {"$in": [new RegExp req.query.author]}
     if req.query.after
@@ -231,7 +231,7 @@ app.route api_root + '/persons'
   .get (req, res)->
     query = {}
     if req.query.name
-      query.name = req.query.name
+      query['full_name'] = {"$in": [new RegExp req.query.name]}
     app.my.persons.find query, {_id: 0}, (err, items)->
       items.toArray (err, docs)->
         if err
