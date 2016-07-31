@@ -200,7 +200,8 @@ app.route api_root + '/books/:book_id/content'
           return res.status(404).end()
         else
           res.redirect doc.html_url
-    else if ext == 'txt'
+    else # ext == 'txt'
+      ext = 'txt'
       get_from_gs app.my, book_id, get_zipped, (err, result)->
         if err
           console.log err
