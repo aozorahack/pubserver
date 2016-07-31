@@ -143,7 +143,7 @@ app.route api_root + '/books/:book_id'
   .get (req, res)->
     book_id = parseInt req.params.book_id
     app.my.books.findOne {book_id: book_id}, {_id: 0}, (err, doc)->
-      if err
+      if err or doc is null
         console.log err
         return res.status(404).end()
       else
@@ -244,7 +244,7 @@ app.route api_root + '/persons/:person_id'
   .get (req, res)->
     person_id = parseInt req.params.person_id
     app.my.persons.findOne {id: person_id}, {_id: 0}, (err, doc)->
-      if err
+      if err or doc is null
         console.log err
         return res.status(404).end()
       else
@@ -271,7 +271,7 @@ app.route api_root + '/workers/:worker_id'
   .get (req, res)->
     worker_id = parseInt req.params.worker_id
     app.my.workers.findOne {id: worker_id}, {_id: 0}, (err, doc)->
-      if err
+      if err or doc is null
         console.log err
         return res.status(404).end()
       else
