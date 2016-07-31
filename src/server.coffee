@@ -258,7 +258,7 @@ app.route api_root + '/workers'
   .get (req, res)->
     query = {}
     if req.query.name
-      query.name = req.query.name
+      query.name = {"$in": [new RegExp req.query.name]}
     app.my.workers.find query, {_id: 0}, (err, items)->
       items.toArray (err, docs)->
         if err
