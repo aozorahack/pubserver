@@ -244,7 +244,7 @@ app.route api_root + '/persons'
 app.route api_root + '/persons/:person_id'
   .get (req, res)->
     person_id = parseInt req.params.person_id
-    app.my.persons.findOne {id: person_id}, {_id: 0}, (err, doc)->
+    app.my.persons.findOne {person_id: person_id}, {_id: 0}, (err, doc)->
       if err or doc is null
         console.log err
         return res.status(404).end()

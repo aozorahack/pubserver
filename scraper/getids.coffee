@@ -27,7 +27,7 @@ scrape_url = (idurl, cb)->
 
 
 idurls =
-  'persons': 'http://reception.aozora.gr.jp/pidlist.php?page=1&pagerow=-1',
+#  'persons': 'http://reception.aozora.gr.jp/pidlist.php?page=1&pagerow=-1',
   'workers': 'http://reception.aozora.gr.jp/widlist.php?page=1&pagerow=-1'
 
 MongoClient.connect mongo_url, (err, db)->
