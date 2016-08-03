@@ -114,7 +114,10 @@ get_bookobj = (entry, cb)->
 
   cb book, role, person
 
-MongoClient.connect mongo_url, (err, db)->
+MongoClient.connect mongo_url,
+  connectTimeoutMS: 120000,
+  socketTimeoutMS: 120000,
+, (err, db)->
   if err
     console.log err
     return -1
