@@ -48,7 +48,7 @@ person_extended_attrs = [
   'author_copyright',
   'base_book_1',
   'base_book_1_publisher',
-  'base_book_1_1st_edition'
+  'base_book_1_1st_edition',
   'base_book_1_edition_input',
   'base_book_1_eidtion_proofing',
   'base_book_1_parent',
