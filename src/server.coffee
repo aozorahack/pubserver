@@ -7,7 +7,7 @@ morgan = require 'morgan'
 bodyParser = require 'body-parser'
 methodOverride = require 'method-override'
 compression = require 'compression'
-multer = require 'multer'
+# multer = require 'multer'
 mongodb = require 'mongodb'
 AdmZip = require 'adm-zip'
 yaml = require 'js-yaml'
@@ -36,10 +36,10 @@ app.use morgan 'dev'
 app.use bodyParser.urlencoded
   extended: false
 app.use bodyParser.json()
-app.use multer
-  onError: (error, next)->
-    console.log err
-    next(error)
+#app.use multer
+#  onError: (error, next)->
+#    console.log err
+#    next(error)
   # onFileUploadStart: (file, req, res)->
   #   console.log "#{file.fieldname} is starting ..."
   # onFileUploadData: (file, data, req, res)->
