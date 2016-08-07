@@ -24,6 +24,8 @@ mongodb_host = process.env.AOZORA_MONGODB_HOST || 'localhost'
 mongodb_port = process.env.AOZORA_MONGODB_PORT || '27017'
 mongo_url = "mongodb://#{mongodb_credential}#{mongodb_host}:#{mongodb_port}/aozora"
 
+DEFAULT_LIMIT = 100
+
 app = express();
 
 version = 'v0.1'
@@ -107,6 +109,10 @@ app.route api_root + '/books'
         options.fields[a] = 1
     if req.query.limit
       options.limit = parseInt req.query.limit
+    else
+      options.limit = DEFAULT_LIMIT
+    if req.query.skip
+      options.skip = parseInt req.query.skip
     # console.log query, options
     app.my.books.find query, options, (err, items)->
       items.toArray (err, docs)->
