@@ -90,13 +90,19 @@ upload_content_data = (db, book_id, source, cb)->
         gs.close (err)->
           cb err
 
+re_or_str = (src)->
+  if src[0] is '/' and src[-1..] is '/'
+    return {"$in": [new RegExp src[1...-1]]}
+  else
+    return src
+
 app.route api_root + '/books'
   .get (req, res)->
     query = {}
     if req.query.title
-      query['title'] = {"$in": [new RegExp req.query.title]}
+      query['title'] = re_or_str req.query.title
     if req.query.author
-      query['authors.full_name'] = {"$in": [new RegExp req.query.author]}
+      query['authors.full_name'] = re_or_str req.query.author
     if req.query.after
       query['release_date'] = {"$gte": new Date (req.query.after)}
     options =
@@ -238,7 +244,8 @@ app.route api_root + '/persons'
   .get (req, res)->
     query = {}
     if req.query.name
-      query['full_name'] = {"$in": [new RegExp req.query.name]}
+      query['full_name'] = re_or_str req.query.name
+      
     app.my.persons.find query, {_id: 0}, (err, items)->
       items.toArray (err, docs)->
         if err
@@ -265,7 +272,8 @@ app.route api_root + '/workers'
   .get (req, res)->
     query = {}
     if req.query.name
-      query.name = {"$in": [new RegExp req.query.name]}
+      query.name = re_or_str req.query.name
+
     app.my.workers.find query, {_id: 0}, (err, items)->
       items.toArray (err, docs)->
         if err
