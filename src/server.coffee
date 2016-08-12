@@ -77,8 +77,8 @@ upload_content = (db, book_id, source_file, cb)->
   gs = new GridStore db, book_id, "#{book_id}.txt", 'w'
   gs.writeFile source_file, cb
 
-upload_content_data = (db, book_id, source, cb)->
-  gs = new GridStore db, book_id, "#{book_id}.txt", 'w'
+upload_content_data = (db, book_id, source, ext, cb)->
+  gs = new GridStore db, book_id, "#{book_id}.#{ext}", 'w'
   gs.open (err, gs)->
     if err
       cb err
@@ -159,25 +159,60 @@ app.route api_root + '/books/:book_id'
         console.log err
         return res.status(404).end()
       else
-        console.log doc
+        # console.log doc
         res.json doc
 
 content_type =
   'txt': 'text/plain; charset=shift_jis'
 
-get_from_gs = (my, book_id, get_file, cb)->
-  GridStore.read app.my.db, "#{book_id}.txt", (err, result)->
+get_from_gs = (my, book_id, get_file, ext, cb)->
+  console.log book_id, ext
+  GridStore.read app.my.db, "#{book_id}.#{ext}", (err, result)->
     if err
       if get_file
         get_file my, book_id, (err)->
           if err
             cb err
           else
-            get_from_gs my, book_id, null, cb
+            get_from_gs my, book_id, null, ext, cb
       else
         cb err
     else
       cb null, zlib.inflateSync result
+
+add_ogp = (body, title, author)->
+  ogp_headers =
+    ['<head prefix="og: http://ogp.me/ns#">',
+     '<meta property="og:type" content="book">',
+     '<meta property="og:image" content="http://www.aozora.gr.jp/images/top_logo.png">',
+     '<meta property="og:image:type" content="image/png">',
+     '<meta property="og:image:width" content="100">',
+     '<meta property="og:image:height" content="100">',
+     "<meta property=\"og:title\" content=\"#{title}(#{author})\""].join '\n'
+
+  return body
+    .toString 'utf-8'
+    .replace /\.\.\/\.\.\//g, 'http://www.aozora.gr.jp/'
+    .replace /\.\.\//g, 'http://www.aozora.gr.jp/cards/'
+    .replace /<head>/, ogp_headers
+
+get_ogpcard = (my, book_id, cb)->
+  my.books.findOne {book_id: book_id}, {card_url: 1, title:1, authors: 1}, (err, doc)->
+    if err or doc is null
+      cb err
+      return
+    request.get doc.card_url,
+      encoding: null
+      headers:
+        'User-Agent': 'Mozilla/5.0'
+        'Accept': '*/*'
+    , (err, res, body)->
+      if err
+        cb err
+        return
+      zdata = zlib.deflateSync add_ogp body, doc.title, doc.authors[0].full_name
+      upload_content_data my.db, book_id, zdata, "card", (err)->
+        cb err
 
 get_zipped = (my, book_id, cb)->
   my.books.findOne {book_id: book_id}, {text_url: 1}, (err, doc)->
@@ -197,9 +232,20 @@ get_zipped = (my, book_id, cb)->
       entry = zip.getEntries()[0] ## assuming zip has only one text entry
       data = zip.readFile entry
       zdata = zlib.deflateSync data
-      upload_content_data my.db, book_id, zdata, (err)->
+      upload_content_data my.db, book_id, zdata, "txt", (err)->
         cb err
 
+
+app.route api_root + '/books/:book_id/card'
+  .get (req, res)->
+    book_id = parseInt req.params.book_id
+    get_from_gs app.my, book_id, get_ogpcard, 'card', (err, result)->
+      if err
+        console.log err
+        return res.status(404).end()
+      else
+        res.set 'Content-Type', 'text/html'
+        res.send result
 
 app.route api_root + '/books/:book_id/content'
   .get (req, res)->
@@ -214,7 +260,7 @@ app.route api_root + '/books/:book_id/content'
           res.redirect doc.html_url
     else # ext == 'txt'
       ext = 'txt'
-      get_from_gs app.my, book_id, get_zipped, (err, result)->
+      get_from_gs app.my, book_id, get_zipped, ext, (err, result)->
         if err
           console.log err
           return res.status(404).end()
@@ -262,7 +308,7 @@ app.route api_root + '/persons/:person_id'
         console.log err
         return res.status(404).end()
       else
-        console.log doc
+        # console.log doc
         res.json doc
 
 #
@@ -290,7 +336,7 @@ app.route api_root + '/workers/:worker_id'
         console.log err
         return res.status(404).end()
       else
-        console.log doc
+        # console.log doc
         res.json doc
 
 
