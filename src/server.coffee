@@ -210,10 +210,16 @@ add_ogp = (body, title, author)->
      '<meta property="og:description" content="...">',
      "<meta property=\"og:title\" content=\"#{title}(#{author})\""].join '\n'
 
-  return body
-    .replace /\.\.\/\.\.\//g, 'http://www.aozora.gr.jp/'
-    .replace /\.\.\//g, 'http://www.aozora.gr.jp/cards/'
-    .replace /<head>/, ogp_headers
+  return body.replace /<head>/, ogp_headers
+
+rel_to_abs_path = (body, ext)->
+  if ext == 'card'
+    return body
+      .replace /\.\.\/\.\.\//g, 'http://www.aozora.gr.jp/'
+      .replace /\.\.\//g, 'http://www.aozora.gr.jp/cards/'
+  else # ext == 'html'
+    return body
+      .replace /\.\.\/\.\.\//g, 'http://www.aozora.gr.jp/cards/'
 
 encodings =
   'card': 'utf-8'
@@ -234,7 +240,11 @@ get_ogpcard = (my, book_id, ext, cb)->
       if err
         cb err
       else
-        cb null, add_ogp iconv.decode(body, encodings[ext]), doc.title, doc.authors[0].full_name
+        encoding = encodings[ext]
+        bodystr = iconv.decode body, encoding
+        bodystr = add_ogp bodystr, doc.title, doc.authors[0].full_name
+        bodystr = rel_to_abs_path bodystr, ext
+        cb null, iconv.encode bodystr, encodings[ext]
 
 get_zipped = (my, book_id, ext, cb)->
   my.books.findOne {book_id: book_id}, {text_url: 1}, (err, doc)->
@@ -275,7 +285,7 @@ app.route api_root + '/books/:book_id/content'
           console.log err
           return res.status(404).end()
         else
-          res.set 'Content-Type', 'text/html'
+          res.set 'Content-Type', 'text/html; charset=shift_jis'
           res.send result
 
     else # ext == 'txt'
