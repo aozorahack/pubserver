@@ -14,6 +14,8 @@ yaml = require 'js-yaml'
 request = require 'request'
 zlib = require 'zlib'
 
+redis = require 'redis'
+
 repo_backend = require './repo_bitbucket'
 
 MongoClient = mongodb.MongoClient
@@ -25,6 +27,7 @@ mongodb_port = process.env.AOZORA_MONGODB_PORT || '27017'
 mongo_url = "mongodb://#{mongodb_credential}#{mongodb_host}:#{mongodb_port}/aozora"
 
 DEFAULT_LIMIT = 100
+DATA_LIFETIME = 3600
 
 app = express();
 
@@ -77,18 +80,24 @@ upload_content = (db, book_id, source_file, cb)->
   gs = new GridStore db, book_id, "#{book_id}.txt", 'w'
   gs.writeFile source_file, cb
 
-upload_content_data = (db, book_id, source, ext, cb)->
-  gs = new GridStore db, book_id, "#{book_id}.#{ext}", 'w'
-  gs.open (err, gs)->
+# upload_content_data = (db, book_id, source, ext, cb)->
+#   gs = new GridStore db, book_id, "#{book_id}.#{ext}", 'w'
+#   gs.open (err, gs)->
+#     if err
+#       cb err
+#       return
+#     gs.write source, (err, gs)->
+#         if err
+#           cb err
+#           return
+#         gs.close (err)->
+#           cb err
+upload_content_data = (rc, key, data, cb)->
+  zlib.deflate data, (err, zdata)->
     if err
       cb err
-      return
-    gs.write source, (err, gs)->
-        if err
-          cb err
-          return
-        gs.close (err)->
-          cb err
+    else
+      rc.setex key, DATA_LIFETIME, zdata, cb
 
 re_or_str = (src)->
   if src[0] is '/' and src[-1..] is '/'
@@ -165,20 +174,28 @@ app.route api_root + '/books/:book_id'
 content_type =
   'txt': 'text/plain; charset=shift_jis'
 
-get_from_gs = (my, book_id, get_file, ext, cb)->
-  console.log book_id, ext
-  GridStore.read app.my.db, "#{book_id}.#{ext}", (err, result)->
-    if err
+get_from_cache = (my, book_id, get_file, ext, cb)->
+  key = "#{ext}#{book_id}"
+  my.rc.get key, (err, result)->
+    if err or not result
       if get_file
-        get_file my, book_id, (err)->
+        get_file my, book_id, (err, data)->
           if err
             cb err
           else
-            get_from_gs my, book_id, null, ext, cb
+            upload_content_data my.rc, key, data, (err)->
+              if err
+                cb err
+              else
+                cb null, data
       else
         cb err
     else
-      cb null, zlib.inflateSync result
+      zlib.inflate result, (err, data)->
+        if err
+          cb err
+        else
+          cb null, data
 
 add_ogp = (body, title, author)->
   ogp_headers =
@@ -209,10 +226,8 @@ get_ogpcard = (my, book_id, cb)->
     , (err, res, body)->
       if err
         cb err
-        return
-      zdata = zlib.deflateSync add_ogp body, doc.title, doc.authors[0].full_name
-      upload_content_data my.db, book_id, zdata, "card", (err)->
-        cb err
+      else
+        cb null, add_ogp body
 
 get_zipped = (my, book_id, cb)->
   my.books.findOne {book_id: book_id}, {text_url: 1}, (err, doc)->
@@ -227,19 +242,15 @@ get_zipped = (my, book_id, cb)->
     , (err, res, body)->
       if err
         cb err
-        return
-      zip = new AdmZip body
-      entry = zip.getEntries()[0] ## assuming zip has only one text entry
-      data = zip.readFile entry
-      zdata = zlib.deflateSync data
-      upload_content_data my.db, book_id, zdata, "txt", (err)->
-        cb err
-
+      else
+        zip = new AdmZip body
+        entry = zip.getEntries()[0] ## assuming zip has only one text entry
+        cb null, zip.readFile entry
 
 app.route api_root + '/books/:book_id/card'
   .get (req, res)->
     book_id = parseInt req.params.book_id
-    get_from_gs app.my, book_id, get_ogpcard, 'card', (err, result)->
+    get_from_cache app.my, book_id, get_ogpcard, 'card', (err, result)->
       if err
         console.log err
         return res.status(404).end()
@@ -260,7 +271,7 @@ app.route api_root + '/books/:book_id/content'
           res.redirect doc.html_url
     else # ext == 'txt'
       ext = 'txt'
-      get_from_gs app.my, book_id, get_zipped, ext, (err, result)->
+      get_from_cache app.my, book_id, get_zipped, ext, (err, result)->
         if err
           console.log err
           return res.status(404).end()
@@ -347,6 +358,7 @@ MongoClient.connect mongo_url, (err, db)->
   port = process.env.PORT || 5000
   app.my = {}
   app.my.db = db
+  app.my.rc = redis.createClient({return_buffers: true})
   app.my.books = db.collection('books')
   app.my.authors = db.collection('authors')
   app.my.persons = db.collection('persons')
