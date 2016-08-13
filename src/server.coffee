@@ -201,11 +201,13 @@ get_from_cache = (my, book_id, get_file, ext, cb)->
 add_ogp = (body, title, author)->
   ogp_headers =
     ['<head prefix="og: http://ogp.me/ns#">',
+     '<meta name="twitter:card" content="summary" />'
      '<meta property="og:type" content="book">',
      '<meta property="og:image" content="http://www.aozora.gr.jp/images/top_logo.png">',
      '<meta property="og:image:type" content="image/png">',
      '<meta property="og:image:width" content="100">',
      '<meta property="og:image:height" content="100">',
+     '<meta property="og:description" content="...">',
      "<meta property=\"og:title\" content=\"#{title}(#{author})\""].join '\n'
 
   return body
