@@ -33,16 +33,17 @@ foreman start web
 
 ## ブラウザからのアクセス
 
-- 新規登録作品のリスト http://153.127.202.91/books/whatsnew.html
+- 新規登録作品のリスト http://www.aozorahack.net/books/whatsnew.html
 
 
 ## APIアクセス方法
 
-いか、Heroku仮稼働しているプロトタイプサーバのURLです。ローカルで動かす時にはホスト名を "localhost:5000"で適宜読み替えてください。
+以下は「さくらのクラウド」で仮稼働しているプロトタイプサーバのURLです。
+ローカルで動かす時にはホスト名を "localhost:5000"で適宜読み替えてください。
 
 #### 本のリストの取得
 ```
-curl http://153.127.202.91/api/v0.1/books
+curl http://www.aozorahack.net/api/v0.1/books
 ```
 
 追加パラメータ
@@ -55,29 +56,34 @@ curl http://153.127.202.91/api/v0.1/books
 
 #### 個別の本の情報の取得
 ```
-curl http://153.127.202.91/api/v0.1/books/{book_id}
+curl http://www.aozorahack.net/api/v0.1/books/{book_id}
+```
+
+#### 本のカードを取得
+```
+curl http://www.aozorahack.net/api/v0.1/books/{book_id}/card
 ```
 
 #### 本の中身をテキストで取得
 ```
-curl http://153.127.202.91/api/v0.1/books/{book_id}/content?format=txt
+curl http://www.aozorahack.net/api/v0.1/books/{book_id}/content?format=txt
 ```
 
 #### 本の中身をhtmlで取得
 ```
-curl http://153.127.202.91/api/v0.1/books/{book_id}/content?format=html
+curl http://www.aozorahack.net/api/v0.1/books/{book_id}/content?format=html
 ```
 
 #### 本の情報をアップロード
 ```
-curl -Fpackage=@{package_file} http://153.127.202.91/api/v0.1/books
+curl -Fpackage=@{package_file} http://www.aozorahack.net/api/v0.1/books
 ```
 
 `package_file`はaozora.txtとaozora.jsonが含まれるzipファイル。
 
 #### 人物情報のリストの取得
 ```
-curl http://153.127.202.91/api/v0.1/persons
+curl http://www.aozorahack.net/api/v0.1/persons
 ```
 
 追加パラメータ
@@ -86,22 +92,22 @@ curl http://153.127.202.91/api/v0.1/persons
 
 #### 個別の人物の情報の取得
 ```
-curl http://153.127.202.91/api/v0.1/persons/{person_id}
+curl http://www.aozorahack.net/api/v0.1/persons/{person_id}
 ```
 
 #### 工作員情報のリストの取得
 ```
-curl http://153.127.202.91/api/v0.1/workers
+curl http://www.aozorahack.net/api/v0.1/workers
 ```
 
 #### 個別の工作員の情報の取得
 ```
-curl http://153.127.202.91/api/v0.1/workers/{worker_id}
+curl http://www.aozorahack.net/api/v0.1/workers/{worker_id}
 ```
 
 #### 本の入力開始(git repositoryの作成)
 ```
-curl -X POST -H 'Content-type: application/json' -d '{"title": {title}, "author": {author}, "id":{book_id}, "private": {true|false}}' http://153.127.202.91/api/v0.1/drafts
+curl -X POST -H 'Content-type: application/json' -d '{"title": {title}, "author": {author}, "id":{book_id}, "private": {true|false}}' http://www.aozorahack.net/api/v0.1/drafts
 ```
 
 ## 仕様
