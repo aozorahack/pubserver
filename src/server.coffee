@@ -15,6 +15,7 @@ request = require 'request'
 zlib = require 'zlib'
 
 redis = require 'redis'
+iconv = require 'iconv-lite'
 
 repo_backend = require './repo_bitbucket'
 
@@ -179,7 +180,7 @@ get_from_cache = (my, book_id, get_file, ext, cb)->
   my.rc.get key, (err, result)->
     if err or not result
       if get_file
-        get_file my, book_id, (err, data)->
+        get_file my, book_id, ext, (err, data)->
           if err
             cb err
           else
@@ -208,17 +209,21 @@ add_ogp = (body, title, author)->
      "<meta property=\"og:title\" content=\"#{title}(#{author})\""].join '\n'
 
   return body
-    .toString 'utf-8'
     .replace /\.\.\/\.\.\//g, 'http://www.aozora.gr.jp/'
     .replace /\.\.\//g, 'http://www.aozora.gr.jp/cards/'
     .replace /<head>/, ogp_headers
 
-get_ogpcard = (my, book_id, cb)->
-  my.books.findOne {book_id: book_id}, {card_url: 1, title:1, authors: 1}, (err, doc)->
+encodings =
+  'card': 'utf-8'
+  'html': 'shift_jis'
+
+get_ogpcard = (my, book_id, ext, cb)->
+  my.books.findOne {book_id: book_id}, {card_url: 1, html_url: 1, title:1, authors: 1}, (err, doc)->
     if err or doc is null
       cb err
       return
-    request.get doc.card_url,
+    console.log doc["#{ext}_url"]
+    request.get doc["#{ext}_url"],
       encoding: null
       headers:
         'User-Agent': 'Mozilla/5.0'
@@ -227,9 +232,9 @@ get_ogpcard = (my, book_id, cb)->
       if err
         cb err
       else
-        cb null, add_ogp body
+        cb null, add_ogp iconv.decode(body, encodings[ext]), doc.title, doc.authors[0].full_name
 
-get_zipped = (my, book_id, cb)->
+get_zipped = (my, book_id, ext, cb)->
   my.books.findOne {book_id: book_id}, {text_url: 1}, (err, doc)->
     if err or doc is null
       cb err
@@ -263,12 +268,14 @@ app.route api_root + '/books/:book_id/content'
     book_id = parseInt req.params.book_id
     ext = req.query.format
     if ext == 'html'
-      app.my.books.findOne {book_id: book_id}, {html_url: 1}, (err, doc)->
+      get_from_cache app.my, book_id, get_ogpcard, 'html', (err, result)->
         if err
           console.log err
           return res.status(404).end()
         else
-          res.redirect doc.html_url
+          res.set 'Content-Type', 'text/html'
+          res.send result
+
     else # ext == 'txt'
       ext = 'txt'
       get_from_cache app.my, book_id, get_zipped, ext, (err, result)->
