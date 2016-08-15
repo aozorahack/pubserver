@@ -369,6 +369,23 @@ app.route api_root + '/workers/:worker_id'
         # console.log doc
         res.json doc
 
+#
+# callback interface
+#
+FB_MESSENGER_VERIFY_TOKEN = process.env.FB_MESSENGER_VERIFY_TOKEN
+
+app.route '/callback/:service'
+  .get (req, res)->
+    if req.params.service == 'fb' # facebook
+      console.dir req.query
+      if req.query['hub.mode'] is 'subscribe' and
+         req.query['hub.verify_token'] is FB_MESSENGER_VERIFY_TOKEN
+        res.send req.query['hub.challenge']
+      else
+        res.status(401).send()
+    else
+      res.status(404).send()
+
 
 MongoClient.connect mongo_url, (err, db)->
   if err
