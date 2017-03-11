@@ -385,7 +385,9 @@ app.route '/callback/:service'
         res.status(401).send()
     else
       res.status(404).send()
-
+  .post (req, res)->
+    console.dir req.body;
+    res.sendStatus(200);
 
 MongoClient.connect mongo_url, (err, db)->
   if err
