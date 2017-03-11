@@ -396,7 +396,8 @@ MongoClient.connect mongo_url, (err, db)->
   port = process.env.PORT || 5000
   app.my = {}
   app.my.db = db
-  app.my.rc = redis.createClient({return_buffers: true})
+  redis_url = process.env.REDIS_URL || "redis://127.0.0.1:6379"
+  app.my.rc = redis.createClient(redis_url, {return_buffers: true})
   app.my.books = db.collection('books')
   app.my.authors = db.collection('authors')
   app.my.persons = db.collection('persons')
