@@ -17,7 +17,7 @@ zlib = require 'zlib'
 redis = require 'redis'
 iconv = require 'iconv-lite'
 
-repo_backend = require './repo_bitbucket'
+# repo_backend = require './repo_bitbucket'
 
 MongoClient = mongodb.MongoClient
 GridStore = mongodb.GridStore
@@ -301,17 +301,17 @@ app.route api_root + '/books/:book_id/content'
 #
 # drafts
 #
-app.route api_root + '/drafts'
-  .post (req, res)->
-    title = req.body.title
-    author = req.body.author
-    book_id = req.body.id
-    is_private = req.body.private == true
-    repo_backend.init_repo title, author, book_id, is_private, (status, data)->
-      if data
-        return res.status(status).json data
-      else
-        return res.sendStatus status
+# app.route api_root + '/drafts'
+#   .post (req, res)->
+#     title = req.body.title
+#     author = req.body.author
+#     book_id = req.body.id
+#     is_private = req.body.private == true
+#     repo_backend.init_repo title, author, book_id, is_private, (status, data)->
+#       if data
+#         return res.status(status).json data
+#       else
+#         return res.sendStatus status
 
 #
 # persons

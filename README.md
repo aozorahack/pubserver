@@ -24,11 +24,6 @@ foreman start web
 * `AOZORA_MONGODB_PORT` MongoDBのポート番号 (default: 27017)
 * `PORT` pubserverの待ち受けポート番号 (default: 5000)
 
-(/draftsを使う場合)
-* `AOZORA_BITBUCKET_USER` BitBucketアカウントのユーザ名
-* `AOZORA_BITBUCKET_PASS` BitBucketアカウントのパスワード
-* `AOZORA_BITBUCKET_EMAIL` BitBucketアカウントのEmailアドレス
-
 
 
 ## ブラウザからのアクセス
@@ -103,11 +98,6 @@ curl http://www.aozorahack.net/api/v0.1/workers
 #### 個別の工作員の情報の取得
 ```
 curl http://www.aozorahack.net/api/v0.1/workers/{worker_id}
-```
-
-#### 本の入力開始(git repositoryの作成)
-```
-curl -X POST -H 'Content-type: application/json' -d '{"title": {title}, "author": {author}, "id":{book_id}, "private": {true|false}}' http://www.aozorahack.net/api/v0.1/drafts
 ```
 
 ## 仕様
