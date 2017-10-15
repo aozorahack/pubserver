@@ -1,1 +1,1 @@
-(cd ./scraper; ./node_modules/.bin/coffee getbooks.coffee; ./node_modules/.bin/coffee getids.coffee)
+(./node_modules/.bin/coffee ./scraper/getbooks.coffee; ./node_modules/.bin/coffee ./scraper/getids.coffee)
