@@ -1,1 +1,1 @@
-(./node_modules/.bin/coffee ./scraper/getbooks.coffee; ./node_modules/.bin/coffee ./scraper/getids.coffee)
+(node ./lib/getbooks.js; node ./lib/getids.js)

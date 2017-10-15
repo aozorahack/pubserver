@@ -4,8 +4,8 @@ module.exports = function(grunt) {
       glob_to_multiple: {
         expand: true,
         flatten: true,
-        cwd: 'src/',
-        src: ['*.coffee'],
+        cwd: './',
+        src: ['src/*.coffee', 'scraper/*.coffee'],
         dest: 'lib/',
         ext: '.js'
       }},
