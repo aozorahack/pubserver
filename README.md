@@ -43,7 +43,7 @@ curl http://www.aozorahack.net/api/v0.1/books
 
 追加パラメータ
  - `title`: タイトル名でのフィルタ
- - `author`: 著者名でのフィルタ
+ - ~~`author`: 著者名でのフィルタ~~ (正しく動作していません)
  - `fields`: 取得する属性を指定
  - `limit`: 取得するアイテム数を制限
  - `skip`: 指定した分のアイテムをスキップしてそれ以降を取得
